@@ -9,7 +9,14 @@ export default defineConfig({
   plugins: [
     electron([
       {
-        entry: 'electron/main.ts'
+        entry: 'electron/main.ts',
+        vite: {
+          build: {
+            rollupOptions: {
+              external: ['discord-rpc']
+            }
+          }
+        }
       },
       {
         entry: 'electron/preload.ts',

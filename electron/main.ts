@@ -9,6 +9,7 @@ import { registerMaintenanceHandlers } from './handlers/maintenance'
 import { registerBootstrapHandlers } from './handlers/bootstraps'
 import logger from 'electron-log/main'
 import { registerSkinHandlers } from './handlers/skin'
+import { startRichPresence, stopRichPresence } from './rpc'
 
 const APP_TITLE = 'Factory 42'
 const BG_COLOR = '#121212'
@@ -114,6 +115,7 @@ app.whenReady().then(() => {
   logger.initialize()
   configureAppMenu()
   createWindow()
+  startRichPresence()
 
   if (mainWindow) {
     registerAuthHandlers(mainWindow)
@@ -129,5 +131,9 @@ app.whenReady().then(() => {
 
 app.on('window-all-closed', () => {
   app.quit()
+})
+
+app.on('will-quit', () => {
+  stopRichPresence()
 })
 
