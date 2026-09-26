@@ -27,6 +27,12 @@
       "output": "release",
       "buildResources": "build"
     },
+    "extraResources": [
+      {
+        "from": ".env",
+        "to": ".env"
+      }
+    ],
     "files": [
       "dist",
       "dist-electron",
@@ -107,7 +113,9 @@
     }
   },
   "dependencies": {
+    "discord-rpc": "^4.0.1",
     "dompurify": "^3.4.2",
+    "dotenv": "^18.0.4",
     "electron-log": "^5.4.3",
     "electron-updater": "^6.8.3",
     "eml-lib": "^2.7.3",
