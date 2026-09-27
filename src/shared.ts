@@ -3,6 +3,7 @@ import { SkinViewer, WalkingAnimation } from 'skinview3d'
 import { skin } from './ipc'
 import { Dialog } from './views/dialog'
 import logger from 'electron-log/renderer'
+import type { WhitelistState } from '../electron/handlers/whitelist'
 
 const DEFAULT_SKIN = {
   id: 'steve',
@@ -16,6 +17,7 @@ const shared = {
   skins: null as ISkin[] | null,
   capes: null as ICape[] | null,
   avatar: null as IAvatar | null,
+  whitelistState: 'unknown' as WhitelistState,
   mainSkinViewer: null as SkinViewer | null,
   auxiliarySkinViewer: null as SkinViewer | null,
   cachedSkinThumbnails: new Map<string, string>(),

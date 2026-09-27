@@ -1,5 +1,6 @@
 import type { IGameSettings, ISystemInfo } from '../electron/handlers/settings'
 import type { IAuthResponse } from '../electron/handlers/auth'
+import type { IWhitelistRequestResponse, IWhitelistResponse } from '../electron/handlers/whitelist'
 import type {
   Account,
   BootstrapEvents,
@@ -48,6 +49,10 @@ declare global {
       }
       maintenance: {
         get: () => Promise<IMaintenance | null>
+      }
+      whitelist: {
+        get: () => Promise<IWhitelistResponse>
+        request: () => Promise<IWhitelistRequestResponse>
       }
       bootstraps: {
         check: () => Promise<IBootstraps>
@@ -137,6 +142,11 @@ export const background = {
 
 export const maintenance = {
   get: async () => await window.api.maintenance.get()
+}
+
+export const whitelist = {
+  get: async () => await window.api.whitelist.get(),
+  request: async () => await window.api.whitelist.request()
 }
 
 export const bootstraps = {

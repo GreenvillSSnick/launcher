@@ -1,5 +1,6 @@
 import { setBlockingView, setUser, setView } from './state'
 import { auth, background, bootstraps, maintenance, skin } from './ipc'
+import { checkWhitelist } from './views/home'
 import logger from 'electron-log/renderer'
 
 const DEFAULT_BACKGROUND = '/src/static/images/bg.png'
@@ -98,6 +99,7 @@ export async function bootstrap() {
 
       setUser(session.account, { skins, capes, avatar })
       setView('home')
+      void checkWhitelist()
     } else {
       setView('login')
     }

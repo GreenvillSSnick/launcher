@@ -138,6 +138,17 @@
             <div class="launch-area">
               <button id="btn-play">PLAY</button>
 
+              <div class="whitelist-box" id="whitelist-box" data-state="unknown">
+                <p class="whitelist-status">
+                  <i class="fa-solid fa-circle-notch fa-spin"></i>
+                  <span>Checking access...</span>
+                </p>
+                <div class="whitelist-actions">
+                  <button id="btn-whitelist" class="btn btn-secondary" disabled>Request whitelist</button>
+                  <button id="btn-whitelist-resend" class="btn btn-secondary" hidden>Re-send</button>
+                </div>
+              </div>
+
               <div class="progress-container hidden" id="launch-progress-container">
                 <div class="progress-info">
                   <span id="launch-progress-label">Downloading...</span>
@@ -155,6 +166,9 @@
           <div class="news-header">
             <h2>News feed</h2>
             <div class="social-links">
+              <a href="https://discord.gg/6ZpzxZfEV8" target="_blank" class="social-btn" title="Join our Discord">
+                <i class="fa-brands fa-discord"></i>
+              </a>
             </div>
           </div>
 
@@ -225,6 +239,16 @@
                     <option value="system">Use system Java (PATH)</option>
                   </select>
                 </div>
+              </div>
+
+              <div class="setting-group">
+                <label><i class="fa-brands fa-discord"></i>&nbsp;&nbsp;Discord Rich Presence</label>
+                <div class="toggle-wrapper">
+                  <button class="toggle-switch" id="rpc-toggle" role="switch" aria-checked="false">
+                    <span class="toggle-knob"></span>
+                  </button>
+                </div>
+                <p class="setting-hint">Show your Factory 42 status on your Discord profile.</p>
               </div>
             </section>
 

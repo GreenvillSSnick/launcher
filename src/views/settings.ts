@@ -3,6 +3,7 @@ import { auth, settings, system, skin } from '../ipc'
 import { Dialog } from './dialog'
 import type { IGameSettings } from '../../electron/handlers/settings'
 import shared from '../shared'
+import logger from 'electron-log/renderer'
 
 const resolutionList = [
   { label: 'Auto (default)', value: '854x480', width: 854, height: 480 },
@@ -55,6 +56,23 @@ function initUIListeners() {
   closeBtn?.addEventListener('click', async () => {
     await saveSettings()
     closeOverlay('settings')
+  })
+
+  const rpcToggle = document.getElementById('rpc-toggle') as HTMLButtonElement
+
+  rpcToggle?.addEventListener('click', async () => {
+    if (!currentSettings) return
+
+    const enabled = rpcToggle.getAttribute('aria-checked') !== 'true'
+    rpcToggle.setAttribute('aria-checked', String(enabled))
+
+    const saved = await settings.set({ ...currentSettings, rpc: enabled })
+    if (saved) {
+      currentSettings = { ...currentSettings, rpc: enabled }
+      logger.log(`Discord Rich Presence ${enabled ? 'enabled' : 'disabled'}`)
+    } else {
+      rpcToggle.setAttribute('aria-checked', String(!enabled))
+    }
   })
 
   logoutBtn?.addEventListener('click', async () => {
@@ -196,9 +214,11 @@ function initFormValues(resolution: { width: number; height: number }) {
   const resolutionSelect = document.getElementById('resolution-select') as HTMLSelectElement
   const launcherActionSelect = document.getElementById('launcher-action-select') as HTMLSelectElement
   const javaSelect = document.getElementById('java-select') as HTMLSelectElement
+  const rpcToggle = document.getElementById('rpc-toggle') as HTMLButtonElement
 
   if (minInput) minInput.value = currentSettings.memory.min + ''
   if (maxInput) maxInput.value = currentSettings.memory.max + ''
+  if (rpcToggle) rpcToggle.setAttribute('aria-checked', String(currentSettings.rpc))
   if (resolutionSelect) {
     const availableResolutions = getAvailableResolutions(resolution)
     resolutionSelect.innerHTML = ''
@@ -225,6 +245,7 @@ async function saveSettings() {
   const launcherActionSelect = document.getElementById('launcher-action-select') as HTMLSelectElement
   const resolutionSelect = document.getElementById('resolution-select') as HTMLSelectElement
   const javaSelect = document.getElementById('java-select') as HTMLSelectElement
+  const rpcToggle = document.getElementById('rpc-toggle') as HTMLButtonElement
 
   const newSettings: IGameSettings = {
     ...currentSettings,
@@ -238,7 +259,8 @@ async function saveSettings() {
       fullscreen: resolutionSelect.value === 'fullscreen'
     },
     java: javaSelect.value === 'bundled' ? 'bundled' : 'path',
-    launcherAction: launcherActionSelect.value as 'close' | 'keep' | 'hide'
+    launcherAction: launcherActionSelect.value as 'close' | 'keep' | 'hide',
+    rpc: rpcToggle?.getAttribute('aria-checked') !== 'false'
   }
 
   await settings.set(newSettings)

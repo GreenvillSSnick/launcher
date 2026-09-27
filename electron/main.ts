@@ -2,14 +2,15 @@ import { app, BrowserWindow, Menu, nativeTheme, shell } from 'electron'
 import path from 'node:path'
 import { registerAuthHandlers } from './handlers/auth'
 import { registerLauncherHandlers } from './handlers/launcher'
-import { registerSettingsHandlers } from './handlers/settings'
+import { readSettings, registerSettingsHandlers } from './handlers/settings'
 import { registerNewsHandlers } from './handlers/news'
 import { registerBackgroundHandlers } from './handlers/background'
 import { registerMaintenanceHandlers } from './handlers/maintenance'
 import { registerBootstrapHandlers } from './handlers/bootstraps'
+import { registerWhitelistHandlers } from './handlers/whitelist'
 import logger from 'electron-log/main'
 import { registerSkinHandlers } from './handlers/skin'
-import { startRichPresence, stopRichPresence } from './rpc'
+import { setRichPresenceEnabled, stopRichPresence } from './rpc'
 
 const APP_TITLE = 'Factory 42'
 const BG_COLOR = '#121212'
@@ -115,7 +116,7 @@ app.whenReady().then(() => {
   logger.initialize()
   configureAppMenu()
   createWindow()
-  startRichPresence()
+  setRichPresenceEnabled(readSettings().rpc)
 
   if (mainWindow) {
     registerAuthHandlers(mainWindow)
@@ -126,6 +127,7 @@ app.whenReady().then(() => {
     registerBootstrapHandlers(mainWindow)
     registerLauncherHandlers(mainWindow)
     registerSettingsHandlers()
+    registerWhitelistHandlers()
   }
 })
 
