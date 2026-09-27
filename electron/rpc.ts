@@ -1,12 +1,15 @@
 import RPC from 'discord-rpc'
 import logger from 'electron-log/main'
+import { API_URL, DISCORD_INVITE_URL } from './const'
 
 const CLIENT_ID = '1548254736782991490'
-const API_URL = 'https://api.justparrot.me/f42/services'
+const SERVICES_URL = `${API_URL}/f42/services`
 const IMAGE_KEY = 'factory42'
 const IMAGE_TEXT = 'Factory 42 SMP'
 const UPDATE_INTERVAL = 30_000
 const RECONNECT_DELAY = 10_000
+
+const ACTIVITY_BUTTONS = [{ label: 'Join our Discord', url: DISCORD_INVITE_URL }]
 
 interface IServiceStatus {
   running?: boolean
@@ -18,13 +21,17 @@ let updater: NodeJS.Timeout | null = null
 let reconnect: NodeJS.Timeout | null = null
 let connecting = false
 let running = false
+// The persisted `rpc` setting is the source of truth, so presence stays off until
+// `setRichPresenceEnabled` is called with the stored value.
+let enabled = false
 
 function setActivity(details: string, state: string): void {
   client?.setActivity({
     details,
     state,
     largeImageKey: IMAGE_KEY,
-    largeImageText: IMAGE_TEXT
+    largeImageText: IMAGE_TEXT,
+    buttons: ACTIVITY_BUTTONS
   })
 }
 
@@ -40,7 +47,7 @@ function readService(payload: unknown): IServiceStatus {
 }
 
 async function getServerStatus(): Promise<IServiceStatus> {
-  const response = await fetch(API_URL, {
+  const response = await fetch(SERVICES_URL, {
     headers: {
       'Content-Type': 'application/json'
     }
@@ -148,7 +155,7 @@ function connect(): void {
 }
 
 export function startRichPresence(): void {
-  if (running) return
+  if (!enabled || running) return
 
   running = true
   logger.log('[RPC] Starting Factory 42 Rich Presence...')
@@ -166,4 +173,14 @@ export function stopRichPresence(): void {
   }
 
   destroyClient()
+}
+
+export function setRichPresenceEnabled(value: boolean): void {
+  if (enabled === value) return
+
+  enabled = value
+  logger.log(`[RPC] Rich Presence ${enabled ? 'enabled' : 'disabled'}`)
+
+  if (enabled) startRichPresence()
+  else stopRichPresence()
 }

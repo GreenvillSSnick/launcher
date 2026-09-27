@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import type { IGameSettings, ISystemInfo } from './handlers/settings'
 import type { IAuthResponse } from './handlers/auth'
+import type { IWhitelistRequestResponse, IWhitelistResponse } from './handlers/whitelist'
 import type {
   Account,
   BootstrapEvents,
@@ -101,6 +102,10 @@ contextBridge.exposeInMainWorld('api', {
   },
   maintenance: {
     get: (): Promise<IMaintenance | null> => ipcRenderer.invoke('maintenance:get')
+  },
+  whitelist: {
+    get: (): Promise<IWhitelistResponse> => ipcRenderer.invoke('whitelist:get'),
+    request: (): Promise<IWhitelistRequestResponse> => ipcRenderer.invoke('whitelist:request')
   },
   bootstraps: {
     check: (): Promise<IBootstraps> => ipcRenderer.invoke('bootstraps:check'),

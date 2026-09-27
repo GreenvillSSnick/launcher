@@ -22,6 +22,7 @@ export function logout() {
   shared.skins = null
   shared.capes = null
   shared.avatar = null
+  shared.whitelistState = 'unknown'
   const nameEl = document.getElementById('user-name')
   if (nameEl) nameEl.innerText = ''
 }

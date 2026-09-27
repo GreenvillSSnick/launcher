@@ -1,5 +1,6 @@
 import { setUser, setView } from '../state'
 import { auth, skin } from '../ipc'
+import { checkWhitelist } from './home'
 import { Dialog } from './dialog'
 import logger from 'electron-log/renderer'
 
@@ -21,6 +22,7 @@ export function initLogin() {
 
         setUser(session.account, { skins, capes, avatar })
         setView('home')
+        void checkWhitelist()
       } else {
         logger.error(session.error)
         await Dialog.show('Login failed', [{ text: 'OK', type: 'ok' }])

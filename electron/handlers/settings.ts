@@ -3,6 +3,7 @@ import logger from 'electron-log/main'
 import fs from 'node:fs'
 import path from 'node:path'
 import os from 'node:os'
+import { setRichPresenceEnabled } from '../rpc'
 
 const settingsPath = path.join(app.getPath('userData'), 'settings.json')
 
@@ -27,6 +28,7 @@ export interface IGameSettings {
     fullscreen: boolean
   }
   launcherAction: 'close' | 'keep' | 'hide'
+  rpc: boolean
 }
 
 export const DEFAULT_SETTINGS: IGameSettings = {
@@ -40,27 +42,33 @@ export const DEFAULT_SETTINGS: IGameSettings = {
     height: 720,
     fullscreen: false
   },
-  launcherAction: 'close'
+  launcherAction: 'hide',
+  rpc: true
+}
+
+export function readSettings(): IGameSettings {
+  try {
+    if (!fs.existsSync(settingsPath)) {
+      fs.writeFileSync(settingsPath, JSON.stringify(DEFAULT_SETTINGS, null, 2))
+      return DEFAULT_SETTINGS
+    }
+    const data = fs.readFileSync(settingsPath, 'utf-8')
+    return { ...DEFAULT_SETTINGS, ...JSON.parse(data) }
+  } catch (err) {
+    logger.error('Error reading settings:', err)
+    return DEFAULT_SETTINGS
+  }
 }
 
 export function registerSettingsHandlers() {
   ipcMain.handle('settings:get', async () => {
-    try {
-      if (!fs.existsSync(settingsPath)) {
-        fs.writeFileSync(settingsPath, JSON.stringify(DEFAULT_SETTINGS, null, 2))
-        return DEFAULT_SETTINGS
-      }
-      const data = fs.readFileSync(settingsPath, 'utf-8')
-      return { ...DEFAULT_SETTINGS, ...JSON.parse(data) }
-    } catch (err) {
-      logger.error('Error reading settings:', err)
-      return DEFAULT_SETTINGS
-    }
+    return readSettings()
   })
 
   ipcMain.handle('settings:set', async (_event, newSettings: IGameSettings) => {
     try {
       fs.writeFileSync(settingsPath, JSON.stringify(newSettings, null, 2))
+      setRichPresenceEnabled(newSettings.rpc)
       return true
     } catch (err) {
       logger.error('Error writing settings:', err)
